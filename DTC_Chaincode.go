@@ -75,7 +75,7 @@ func (t *DTCChaincode) InitContract(stub shim.ChaincodeStubInterface, args []str
 func (t *DTCChaincode) Invoke(stub shim.ChaincodeStubInterface, function string, args []string) ([]byte, error) {
  fmt.Println("invoke is running " + function)
  // register customer
- if function == "save" {
+ if function == "saveContract" {
   return t.saveContract(stub, args)
  }
  if function == "addBuyer" {
@@ -141,10 +141,8 @@ func (t *DTCChaincode) addBuyer(stub shim.ChaincodeStubInterface, args []string)
 	jsonAsBytes, _ := json.Marshal(BuyerObj)
 
 	err = stub.PutState(buyerIndexTxStr, jsonAsBytes)
-	if err != nil {
-		return nil, err
-	}
-	return jsonAsBytes, nil
+
+	return jsonAsBytes, err
 }
 
 
