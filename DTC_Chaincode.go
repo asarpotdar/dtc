@@ -89,7 +89,7 @@ func (t *DTCChaincode) saveContract(stub shim.ChaincodeStubInterface, args []str
 	var ContractDataList []ContractData
 	var err error
 
-	if len(args) != 7 {
+	if len(args) != 8 {
 		return nil, errors.New("Incorre		ct number of arguments. Need 14 arguments")
 	}
 
@@ -101,6 +101,8 @@ func (t *DTCChaincode) saveContract(stub shim.ChaincodeStubInterface, args []str
 	ContractDataObj.SELLER_ID = args[4]
 	ContractDataObj.BUYER_ID = args[5]
 	ContractDataObj.DELIVERY_DATE = args[6]
+	ContractDataObj.STATUS = args[7]
+
 
 	fmt.Printf("Input from user:%s\n", ContractDataObj)
 
@@ -124,10 +126,6 @@ func (t *DTCChaincode) addBuyer(stub shim.ChaincodeStubInterface, args []string)
 
 	var BuyerObj Buyer
 	var err error
-
-	if len(args) != 6 {
-		return nil, errors.New("Incorre		ct number of arguments. Need 14 arguments")
-	}
 
 	// Initialize the chaincode
 	BuyerObj.BUYER_ID = args[0]
@@ -156,7 +154,7 @@ func (t *DTCChaincode) Query(stub shim.ChaincodeStubInterface,function string, a
 	if function == "GetContractDetails" {
 		resAsBytes, err = t.GetContractDetails(stub, id)
   }
-  if function == "getBuyers" {
+  if function == "GetBuyers" {
 		resAsBytes, err = t.GetBuyers(stub, id)
   }
 	fmt.Printf("Query Response:%s\n", resAsBytes)
@@ -228,9 +226,9 @@ func (t *DTCChaincode) GetBuyers(stub shim.ChaincodeStubInterface, contractId st
 		//return nil, errors.New("Failed to get Merchant Transactions")
 	//}
 	//var BuyerObjs []Buyer
-	res, err := json.Marshal("No Data found")
+	//res, err := json.Marshal("No Data found")
 	fmt.Printf("Output from chaincode: %s\n", BuyerTxsAsBytes)
-	return res, err
+	return BuyerTxsAsBytes, err
 
 }
 
