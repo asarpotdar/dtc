@@ -46,7 +46,7 @@ func (t *DTCChaincode) Init(stub shim.ChaincodeStubInterface, function string, a
  if len(args) != 1 {
   return nil, errors.New("Incorrect number of arguments. Expecting 1")
  }
- if function == "contract"{
+ if function == "InitContract"{
   t.InitContract(stub, args);
  }
 
@@ -58,9 +58,7 @@ func (t *DTCChaincode) Init(stub shim.ChaincodeStubInterface, function string, a
 
 func (t *DTCChaincode) InitContract(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
  var err error
- if len(args) != 1 {
-  return nil, errors.New("Incorrect number of arguments. Expecting 1")
- }
+
  fmt.Println("Init for Customer Data")
  var emptyContract []ContractData
  jsonAsBytes, _ := json.Marshal(emptyContract)
@@ -91,7 +89,7 @@ func (t *DTCChaincode) saveContract(stub shim.ChaincodeStubInterface, args []str
 	var ContractDataList []ContractData
 	var err error
 
-	if len(args) != 6 {
+	if len(args) != 7 {
 		return nil, errors.New("Incorre		ct number of arguments. Need 14 arguments")
 	}
 
