@@ -231,10 +231,10 @@ func (t *DTCChaincode) GetBuyers(stub shim.ChaincodeStubInterface, contractId st
 	if err != nil {
 		return nil, errors.New("Failed to get Merchant Transactions")
 	}
-	var BuyerObjs []Buyer
-	json.Unmarshal(BuyerTxsAsBytes, &BuyerObjs)
+	//var BuyerObjs []Buyer
+	res, err := json.Marshal("No Data found")
 	fmt.Printf("Output from chaincode: %s\n", BuyerTxsAsBytes)
-	return BuyerTxsAsBytes, nil
+	return res, nil
 
 }
 
