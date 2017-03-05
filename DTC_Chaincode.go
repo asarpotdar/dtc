@@ -12,6 +12,7 @@ type DTCChaincode struct {
 }
 
 var contractIndexTxStr = "_contractIndexTxStr"
+var buyerIndexTxStr = "_buyerIndexTxStr"
 
 type ContractData struct{
 	CONTRACT_ID string `json:"CONTRACT_ID"`
@@ -23,7 +24,20 @@ type ContractData struct{
 	SELLER_ID string `json:"SELLER_ID"`
 	BUYER_ID string `json:"BUYER_ID"`
 	DEL_ADDR string `json:"BUYER_ID"`
+	STATUS string `json:"STATUS"`
 
+}
+
+type Buyer struct{
+	BUYER_ID string `json:"BUYER_ID"`
+	BUYER_NAME string `json:"BUYER_NAME"`
+	BUYER_BANK_ID string `json:"BUYER_BANK_ID"`
+}
+
+type Seller struct{
+	SELLER_ID string `json:"SELLER_ID"`
+	SELLER_NAME string `json:"SELLER_NAME"`
+	SELLER_BANK_ID string `json:"SELLER_BANK_ID"`
 }
 
 // Init resets all the things
@@ -64,6 +78,9 @@ func (t *DTCChaincode) Invoke(stub shim.ChaincodeStubInterface, function string,
  if function == "save" {
   return t.saveContract(stub, args)
  }
+ if function == "addBuyer" {
+	return t.addBuyer(stub, args)
+ }
  fmt.Println("invoke did not find func: " + function)     //error
  return nil, errors.New("Received unknown function invocation: " + function)
 }
@@ -75,7 +92,7 @@ func (t *DTCChaincode) saveContract(stub shim.ChaincodeStubInterface, args []str
 	var err error
 
 	if len(args) != 6 {
-		return nil, errors.New("Incorrect number of arguments. Need 14 arguments")
+		return nil, errors.New("Incorre		ct number of arguments. Need 14 arguments")
 	}
 
 	// Initialize the chaincode
@@ -105,6 +122,32 @@ func (t *DTCChaincode) saveContract(stub shim.ChaincodeStubInterface, args []str
 	return nil, nil
 }
 
+func (t *DTCChaincode) addBuyer(stub shim.ChaincodeStubInterface, args []string) ([]byte, error) {
+
+	var BuyerObj Buyer
+	var err error
+
+	if len(args) != 6 {
+		return nil, errors.New("Incorre		ct number of arguments. Need 14 arguments")
+	}
+
+	// Initialize the chaincode
+	BuyerObj.BUYER_ID = args[0]
+	BuyerObj.BUYER_NAME = args[1]
+	BuyerObj.BUYER_BANK_ID = args[2]
+
+	fmt.Printf("Input from user:%s\n", BuyerObj)
+
+	jsonAsBytes, _ := json.Marshal(BuyerObj)
+
+	err = stub.PutState(buyerIndexTxStr, jsonAsBytes)
+	if err != nil {
+		return nil, err
+	}
+	return jsonAsBytes, nil
+}
+
+
 // Query callback representing the query of a chaincode
 func (t *DTCChaincode) Query(stub shim.ChaincodeStubInterface,function string, args []string) ([]byte, error) {
 
@@ -118,8 +161,12 @@ func (t *DTCChaincode) Query(stub shim.ChaincodeStubInterface,function string, a
 
 	contractId = args[0]
 
-	resAsBytes, err = t.GetContractDetails(stub, contractId)
-
+	if function == "getContractDetails" {
+		resAsBytes, err = t.GetContractDetails(stub, contractId)
+  }
+  if function == "getBuyers" {
+		resAsBytes, err = t.GetBuyers(stub, contractId)
+  }
 	fmt.Printf("Query Response:%s\n", resAsBytes)
 
 	if err != nil {
@@ -175,6 +222,20 @@ func (t *DTCChaincode) GetContractDetails(stub shim.ChaincodeStubInterface, cont
 		}
 		return res, nil
 	}
+}
+
+func (t *DTCChaincode) GetBuyers(stub shim.ChaincodeStubInterface, contractId string) ([]byte, error) {
+
+	//var requiredObj RegionData
+	BuyerTxsAsBytes, err := stub.GetState(buyerIndexTxStr)
+	if err != nil {
+		return nil, errors.New("Failed to get Merchant Transactions")
+	}
+	var BuyerObjs []Buyer
+	json.Unmarshal(BuyerTxsAsBytes, &BuyerObjs)
+	fmt.Printf("Output from chaincode: %s\n", BuyerTxsAsBytes)
+	return BuyerTxsAsBytes, nil
+
 }
 
 
