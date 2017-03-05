@@ -147,21 +147,17 @@ func (t *DTCChaincode) addBuyer(stub shim.ChaincodeStubInterface, args []string)
 // Query callback representing the query of a chaincode
 func (t *DTCChaincode) Query(stub shim.ChaincodeStubInterface,function string, args []string) ([]byte, error) {
 
-	var contractId string // Entities
+	var id string // Entities
 	var err error
 	var resAsBytes []byte
 
-	if len(args) != 1 {
-		return nil, errors.New("Incorrect number of arguments. Expecting name of the person to query")
-	}
+	id = args[0]
 
-	contractId = args[0]
-
-	if function == "getContractDetails" {
-		resAsBytes, err = t.GetContractDetails(stub, contractId)
+	if function == "GetContractDetails" {
+		resAsBytes, err = t.GetContractDetails(stub, id)
   }
   if function == "getBuyers" {
-		resAsBytes, err = t.GetBuyers(stub, contractId)
+		resAsBytes, err = t.GetBuyers(stub, id)
   }
 	fmt.Printf("Query Response:%s\n", resAsBytes)
 
@@ -169,6 +165,9 @@ func (t *DTCChaincode) Query(stub shim.ChaincodeStubInterface,function string, a
 		return nil, err
 	}
 
+	if err != nil {
+	return nil, errors.New("Failed to Marshal the required Obj")
+	}
 	return resAsBytes, nil
 }
 
@@ -177,8 +176,9 @@ func (t *DTCChaincode) GetContractDetails(stub shim.ChaincodeStubInterface, cont
 	//var requiredObj RegionData
 	var objFound bool
 	ContractTxsAsBytes, err := stub.GetState(contractIndexTxStr)
+	fmt.Printf("Output from chaincode >>>>> : %s\n", ContractTxsAsBytes)
 	if err != nil {
-		return nil, errors.New("Failed to get Merchant Transactions")
+	return nil, errors.New("Failed to Marshal the required Obj")
 	}
 	var ContractTxDataObjs []ContractData
 	var ContractTxDataObjs1 []ContractData
